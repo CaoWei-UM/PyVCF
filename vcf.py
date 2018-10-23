@@ -119,7 +119,7 @@ class _vcf_metadata_parser(object):
         self.aggro = aggressive
         self.info_pattern = re.compile(r'''\#\#INFO=<
             ID=(?P<id>[^,]+),
-            Number=(?P<number>\d+|\.|[AG]),
+            Number=(?P<number>\d+|\.|[AGR]),
             Type=(?P<type>Integer|Float|Flag|Character|String),
             Description="(?P<desc>[^"]*)"
             >''', re.VERBOSE)
@@ -129,7 +129,7 @@ class _vcf_metadata_parser(object):
             >''', re.VERBOSE)
         self.format_pattern = re.compile(r'''\#\#FORMAT=<
             ID=(?P<id>.+),
-            Number=(?P<number>\d+|\.|[AG]),
+            Number=(?P<number>\d+|\.|[AGR]),
             Type=(?P<type>.+),
             Description="(?P<desc>.*)"
             >''', re.VERBOSE)
@@ -272,7 +272,7 @@ class VCFReader(object):
 
         parser = _vcf_metadata_parser()
 
-        line = self.reader.next()
+        line = self.reader.__next__()
         while line.startswith('##'):
             line = line.strip()
             if line.startswith('##INFO'):
@@ -291,7 +291,7 @@ class VCFReader(object):
                 key, val = parser.read_meta(line.strip())
                 self._metadata[key] = val
 
-            line = self.reader.next()
+            line = self.reader.__next__()
 
         fields = line.split()
         self._samples = fields[9:]
@@ -379,11 +379,11 @@ class VCFReader(object):
 
         return samp_data
 
-    def next(self):
+    def __next__(self):
         '''Return the next record in the file.'''
         if self._samples is None:
             self._parse_metainfo()
-        row = self.reader.next().split()
+        row = self.reader.__next__().split()
         chrom = row[0]
         pos = int(row[1])
 
